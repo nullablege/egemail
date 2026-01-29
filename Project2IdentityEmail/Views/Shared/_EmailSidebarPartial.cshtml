@@ -1,0 +1,78 @@
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@inject UserManager<Project2IdentityEmail.Entities.AppUser> UserManager
+@inject Project2IdentityEmail.Context.EmailContext Context
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var userName = user != null ? $"{user.Name} {user.Surname}" : "Kullanıcı";
+    var userAvatar = user?.ImageUrl ?? "~/assets/images/avatars/avatar-1.png";
+    
+    var kategoriler = await Context.Kategoriler.ToListAsync();
+    var aktifKategoriId = ViewData["AktifKategoriId"] as int?;
+    var activePage = ViewData["ActivePage"] as string;
+}
+
+<div class="email-sidebar">
+    <div class="email-sidebar-header d-grid">
+        <a href="javascript:;" class="btn btn-primary compose-mail-btn"><i class='bx bx-plus me-2'></i> Oluştur</a>
+    </div>
+    <div class="email-sidebar-content">
+        <div class="email-navigation">
+            <a asp-action="Index" asp-controller="Home" class="list-group-item d-flex align-items-center @(activePage == "Inbox" ? "active" : "")">
+                <i class='bx bxs-inbox me-3 font-20'></i><span>Gelen Kutusu</span>
+            </a>
+            <a asp-action="Durum" asp-controller="Home" asp-route-tip="yildizli" class="list-group-item d-flex align-items-center @(activePage == "Yildizli" ? "active" : "")">
+                <i class='bx bxs-star me-3 font-20'></i><span>Yıldızlı</span>
+            </a>
+            <a asp-action="Durum" asp-controller="Home" asp-route-tip="gonderilen" class="list-group-item d-flex align-items-center @(activePage == "Gonderilen" ? "active" : "")">
+                <i class='bx bxs-send me-3 font-20'></i><span>Gönderilen</span>
+            </a>
+            <a asp-action="Durum" asp-controller="Home" asp-route-tip="cop" class="list-group-item d-flex align-items-center @(activePage == "Cop" ? "active" : "")">
+                <i class='bx bxs-trash-alt me-3 font-20'></i><span>Çöp Kutusu</span>
+            </a>
+            <a asp-action="Statistics" asp-controller="Home" class="list-group-item d-flex align-items-center @(activePage == "Statistics" ? "active" : "")">
+                <i class='bx bx-line-chart me-3 font-20'></i><span>İstatistikler</span>
+            </a>
+        </div>
+    </div>
+    <div class="email-navigation mt-3">
+        <div class="list-group list-group-flush">
+            <div class="list-group-item"><span>Kategoriler</span></div>
+            @foreach (var kategori in kategoriler)
+            {
+                var isActive = aktifKategoriId == kategori.KategoriId;
+                <a asp-action="Kategori" asp-controller="Home" asp-route-id="@kategori.KategoriId" 
+                   class="list-group-item d-flex align-items-center @(isActive ? "active" : "")">
+                    <i class='bx @kategori.Icon me-3 font-20 @kategori.Renk'></i>
+                    <span>@kategori.Ad</span>
+                </a>
+            }
+        </div>
+    </div>
+    <div class="email-meeting">
+        <div class="list-group list-group-flush">
+            <div class="list-group-item"><span>Hesap</span></div>
+            <a asp-action="Index" asp-controller="Profile" class="list-group-item d-flex align-items-center"><i class='bx bx-user me-3 font-20'></i><span>Profilim</span></a>
+            <a asp-action="Logout" asp-controller="Login" class="list-group-item d-flex align-items-center text-danger"><i class='bx bx-log-out me-3 font-20'></i><span>Çıkış Yap</span></a>
+            <div class="list-group-item email-hangout cursor-pointer border-top">
+                <div class="d-flex align-items-center">
+                    <div class="chat-user-online">
+                        <img src="@userAvatar" width="42" height="42" class="rounded-circle" alt="" style="object-fit: cover;" />
+                    </div>
+                    <div class="flex-grow-1 ms-2">
+                        <p class="mb-0">@userName</p>
+                    </div>
+                    <div class="dropdown">
+                        <div class="font-24 dropdown-toggle dropdown-toggle-nocaret" data-bs-toggle="dropdown"><i class='bx bx-dots-vertical-rounded'></i></div>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" asp-action="Index" asp-controller="Profile"><i class='bx bx-user me-2'></i>Profilim</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" asp-action="Logout" asp-controller="Login"><i class='bx bx-log-out me-2'></i>Çıkış Yap</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

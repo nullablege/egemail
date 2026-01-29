@@ -1,0 +1,265 @@
+﻿@using System.Globalization
+@model Project2IdentityEmail.Dtos.IndexDto
+
+
+@{
+    ViewData["Title"] = "Gelen Kutusu";
+    var currentSearch = ViewData["CurrentSearch"] as string;
+}
+
+<div class="email-wrapper">
+    <partial name="_EmailSidebarPartial" />
+
+    <div class="email-header d-xl-flex align-items-center">
+        <div class="d-flex align-items-center">
+            <div class="email-toggle-btn"><i class='bx bx-menu'></i></div>
+            <div class="btn btn-white">
+                <input class="form-check-input" type="checkbox" id="selectAllCheckbox" title="Tümünü Seç">
+            </div>
+            <div class="">
+                <a href="@Url.Action("Index", "Home")" class="btn btn-white ms-2" title="Yenile"><i class='bx bx-refresh me-0'></i></a>
+            </div>
+            <div class="">
+                <button type="button" class="btn btn-white ms-2" title="Arşivle"><i class='bx bx-downvote me-0'></i></button>
+            </div>
+            <div class="d-none d-md-flex">
+                <button type="button" class="btn btn-white ms-2" title="Spam olarak işaretle"><i class='bx bx-file me-0'></i></button>
+            </div>
+            <div class="">
+                <button type="button" class="btn btn-white ms-2" id="deleteSelectedBtn" title="Seçilenleri Sil" disabled><i class='bx bx-trash me-0'></i></button>
+            </div>
+        </div>
+        <div class="flex-grow-1 mx-xl-2 my-2 my-xl-0">
+            <form asp-action="Index" asp-controller="Home" method="get" id="searchForm">
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent"><i class="bx bx-search"></i></span>
+                    <input type="text" name="search" class="form-control" placeholder="Posta ara (gönderen, konu, içerik)" value="@currentSearch" id="searchInput">
+                    @if (!string.IsNullOrEmpty(currentSearch))
+                    {
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary" title="Aramayı Temizle"><i class='bx bx-x'></i></a>
+                    }
+                </div>
+            </form>
+        </div>
+        <div class="ms-auto d-flex align-items-center">
+        @{
+            var baslangic = Model.ToplamMesaj == 0 ? 0 : (Model.SayfaSayisi - 1) * 50 + 1;
+            var bitis = Model.ToplamMesaj == 0 ? 0 : Math.Min(Model.SayfaSayisi * 50, Model.ToplamMesaj);
+            var isPrevDisabled = Model.ToplamMesaj == 0 || Model.SayfaSayisi <= 1;
+            var isNextDisabled = Model.ToplamMesaj == 0 || Model.SayfaSayisi >= (int)Math.Ceiling((double)Model.ToplamMesaj / 50);
+        }
+        <button class="btn btn-sm btn-light">@baslangic-@bitis / @Model.ToplamMesaj</button>
+        <a class="btn btn-white px-2 ms-2 @(isPrevDisabled ? "disabled" : "")"
+           asp-action="Index" asp-controller="Home"
+           asp-route-page="@(Model.SayfaSayisi - 1)"
+           asp-route-search="@currentSearch"
+           title="Önceki" aria-disabled="@isPrevDisabled" tabindex="@(isPrevDisabled ? "-1" : "0")">
+            <i class='bx bx-chevron-left me-0'></i>
+        </a>
+
+        <a class="btn btn-white px-2 ms-2 @(isNextDisabled ? "disabled" : "")"
+           asp-action="Index" asp-controller="Home"
+           asp-route-page="@(Model.SayfaSayisi + 1)"
+           asp-route-search="@currentSearch"
+           title="Sonraki" aria-disabled="@isNextDisabled" tabindex="@(isNextDisabled ? "-1" : "0")">
+            <i class='bx bx-chevron-right me-0'></i>
+        </a>
+        </div>
+    </div>
+
+    <div class="email-content">
+        <div class="">
+            <div class="email-list">
+            @foreach (var x in Model.Mailler)
+            {
+                var unreadClass = !x.OkunduMu ? "email-unread" : "";
+                var starClass = x.YildizliMi ? "bxs-star text-warning" : "bx-star";
+                
+                <div class="d-md-flex align-items-center email-message px-3 py-1 bg-body @unreadClass" data-mail-id="@x.MailId">
+                    <div class="d-flex align-items-center email-actions">
+                        <input class="form-check-input email-checkbox" type="checkbox" value="@x.MailId" onclick="event.stopPropagation();" />
+                        <i class='bx @starClass font-20 mx-2 email-star' data-mail-id="@x.MailId" onclick="event.preventDefault(); event.stopPropagation(); toggleStar(this, @x.MailId);" title="Yıldızla"></i>
+                        <a href="/Home/EmailRead/@x.MailId" class="text-decoration-none text-body">
+                            <p class="mb-0"><b>@x.MailBaslik</b></p>
+                        </a>
+                    </div>
+                    <div class="flex-grow-1">
+                        <a href="/Home/EmailRead/@x.MailId" class="text-decoration-none text-muted">
+                            <p class="mb-0 ms-2">
+                                @(x.MailIcerik?.Length > 40 ? x.MailIcerik[..40] + "..." : (x.MailIcerik ?? string.Empty))
+                            </p>
+                        </a>
+                    </div>
+                    <div class="ms-auto d-flex align-items-center">
+                        <small class="text-muted me-2">@x.GonderenAdi</small>
+                        <p class="mb-0 email-time">@x.MailSaat.ToString("dd MMM", new CultureInfo("tr-TR"))</p>
+                    </div>
+                </div>
+            }
+
+            @if (Model.Mailler.Count == 0)
+            {
+                <div class="text-center py-5">
+                    <i class='bx bx-inbox font-50 text-muted'></i>
+                    <p class="text-muted mt-3">
+                        @if (!string.IsNullOrEmpty(currentSearch))
+                        {
+                            <span>"@currentSearch" için sonuç bulunamadı.</span>
+                        }
+                        else
+                        {
+                            <span>Gelen kutunuz boş.</span>
+                        }
+                    </p>
+                </div>
+            }
+            
+            </div>
+        </div>
+    </div>
+
+    <partial name="_ComposeEmailPartial" />
+    <div class="overlay email-toggle-btn-mobile"></div>
+</div>
+
+@section Styles {
+    <style>
+        .email-unread {
+            background-color: #f0f4ff !important;
+            font-weight: 600;
+        }
+        .email-unread .mb-0 b {
+            font-weight: 700;
+        }
+        .email-star {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .email-star:hover {
+            transform: scale(1.2);
+        }
+        .email-message {
+            transition: background-color 0.2s ease;
+            border-bottom: 1px solid #eee;
+        }
+        .email-message:hover {
+            background-color: #f8f9fa !important;
+        }
+        .email-checkbox {
+            cursor: pointer;
+        }
+        .font-50 {
+            font-size: 50px;
+        }
+    </style>
+}
+
+@section Scripts {
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    
+    <script>
+        new PerfectScrollbar('.email-navigation');
+        new PerfectScrollbar('.email-list');
+
+        var quill = new Quill('#editor-container', {
+            theme: 'snow'
+        });
+
+        document.querySelector('.email-form').addEventListener('submit', function() {
+            var bodyInput = document.querySelector('#hiddenBodyInput');
+            bodyInput.value = quill.root.innerHTML;
+        });
+
+        function toggleStar(element, mailId) {
+            fetch('/Home/ToggleStar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'id=' + mailId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.yildizliMi) {
+                        element.classList.remove('bx-star');
+                        element.classList.add('bxs-star', 'text-warning');
+                    } else {
+                        element.classList.remove('bxs-star', 'text-warning');
+                        element.classList.add('bx-star');
+                    }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        document.getElementById('selectAllCheckbox').addEventListener('change', function() {
+            var checkboxes = document.querySelectorAll('.email-checkbox');
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = this.checked;
+            }.bind(this));
+            updateDeleteButton();
+        });
+
+        document.querySelectorAll('.email-checkbox').forEach(function(checkbox) {
+            checkbox.addEventListener('change', updateDeleteButton);
+        });
+
+        function updateDeleteButton() {
+            var checkedBoxes = document.querySelectorAll('.email-checkbox:checked');
+            var deleteBtn = document.getElementById('deleteSelectedBtn');
+            deleteBtn.disabled = checkedBoxes.length === 0;
+        }
+
+        document.getElementById('deleteSelectedBtn').addEventListener('click', function() {
+            var checkedBoxes = document.querySelectorAll('.email-checkbox:checked');
+            var ids = [];
+            checkedBoxes.forEach(function(checkbox) {
+                ids.push(parseInt(checkbox.value));
+            });
+
+            if (ids.length === 0) {
+                alert('Lütfen silmek istediğiniz e-postaları seçin.');
+                return;
+            }
+
+            if (!confirm(ids.length + ' e-posta silinecek. Emin misiniz?')) {
+                return;
+            }
+
+            fetch('/Home/DeleteEmails', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(ids)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    checkedBoxes.forEach(function(checkbox) {
+                        var row = checkbox.closest('.email-message');
+                        if (row) {
+                            row.remove();
+                        }
+                    });
+                    document.getElementById('selectAllCheckbox').checked = false;
+                    updateDeleteButton();
+                } else {
+                    alert('Silme işlemi başarısız: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Bir hata oluştu.');
+            });
+        });
+
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('searchForm').submit();
+            }
+        });
+    </script>
+}

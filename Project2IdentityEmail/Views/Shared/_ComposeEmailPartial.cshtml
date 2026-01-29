@@ -1,0 +1,142 @@
+<div class="compose-mail-popup">
+    <div class="card">
+        <div class="card-header bg-dark text-white py-2 cursor-pointer">
+            <div class="d-flex align-items-center">
+                <div class="compose-mail-title">Yeni Mesaj</div>
+                <div class="compose-mail-close ms-auto">x</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <form id="composeEmailForm" style="display: contents;">
+                <div class="mb-3">
+                    <input type="email" class="form-control" placeholder="Kime (örn: kullanici@email.com)" id="emailTo" required />
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" placeholder="Konu" id="emailSubject" required />
+                </div>
+                <div class="mb-3">
+                    <div id="compose-editor" style="height: 200px;"></div>
+                </div>
+                <div class="mb-0">
+                    <div class="d-flex align-items-center">
+                        <div class="">
+                            <div class="btn-group">
+                                <button type="submit" class="btn btn-primary" id="sendEmailBtn">
+                                    <i class='bx bx-send me-1'></i> Gönder
+                                </button>
+                                <button type="button" class="btn btn-primary split-bg-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+                                    <span class="visually-hidden">Açılır Menü</span>
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="javascript:;" onclick="document.getElementById('composeEmailForm').requestSubmit()">Gönder</a>
+                                    <a class="dropdown-item" href="javascript:;">Taslak olarak kaydet</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item compose-mail-close" href="javascript:;">İptal</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ms-2">
+                            <button type="button" class="btn border-0 btn-sm btn-white" title="Metin biçimi"><i class="lni lni-text-format"></i></button>
+                            <button type="button" class="btn border-0 btn-sm btn-white" title="Bağlantı ekle"><i class='bx bx-link-alt'></i></button>
+                            <button type="button" class="btn border-0 btn-sm btn-white" title="Emoji ekle"><i class="lni lni-emoji-tounge"></i></button>
+                            <button type="button" class="btn border-0 btn-sm btn-white" title="Dosya ekle"><i class="lni lni-google-drive"></i></button>
+                        </div>
+                        <div class="ms-auto">
+                            <button type="button" class="btn border-0 btn-sm btn-white compose-mail-close" title="İptal"><i class="lni lni-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div id="emailStatus" class="mt-2" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof Quill !== 'undefined' && document.getElementById('compose-editor')) {
+        var composeQuill = new Quill('#compose-editor', {
+            theme: 'snow',
+            placeholder: 'Mesajınızı yazın...',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['link'],
+                    ['clean']
+                ]
+            }
+        });
+
+        document.getElementById('composeEmailForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            var emailTo = document.getElementById('emailTo').value.trim();
+            var emailSubject = document.getElementById('emailSubject').value.trim();
+            var emailBody = composeQuill.root.innerHTML;
+            var statusDiv = document.getElementById('emailStatus');
+            var submitBtn = document.getElementById('sendEmailBtn');
+
+            if (!emailTo) {
+                showStatus('Lütfen alıcı e-posta adresini giriniz.', 'danger');
+                return;
+            }
+            if (!emailSubject) {
+                showStatus('Lütfen konu giriniz.', 'danger');
+                return;
+            }
+            if (composeQuill.getText().trim().length < 1) {
+                showStatus('Lütfen mesaj içeriği giriniz.', 'danger');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Gönderiliyor...';
+
+            fetch('/Home/SendEmail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    AliciEmail: emailTo,
+                    Konu: emailSubject,
+                    Icerik: emailBody
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus(data.message, 'success');
+                    document.getElementById('emailTo').value = '';
+                    document.getElementById('emailSubject').value = '';
+                    composeQuill.setContents([]);
+                    
+                    setTimeout(function() {
+                        document.querySelector('.compose-mail-popup').classList.remove('active');
+                        statusDiv.style.display = 'none';
+                    }, 2000);
+                } else {
+                    showStatus(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showStatus('Bir hata oluştu. Lütfen tekrar deneyin.', 'danger');
+            })
+            .finally(function() {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="bx bx-send me-1"></i> Gönder';
+            });
+        });
+
+        function showStatus(message, type) {
+            var statusDiv = document.getElementById('emailStatus');
+            statusDiv.className = 'mt-2 alert alert-' + type;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+        }
+    }
+});
+</script>
