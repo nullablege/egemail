@@ -1,74 +1,104 @@
-EgeMail - Yeni Nesil Yapay Zeka Destekli E-Posta Yönetim ve Otomasyon Sistemi
-Bu proje, M&Y Akademi Full Stack C# Bootcamp kapsamında "Case 2" olarak geliştirilmiş; modern web geliştirme standartlarını, yüksek güvenlik protokollerini ve yapay zeka destekli otomasyonu bir araya getiren kapsamlı bir e-posta yönetim simülasyonudur.
+# 📧 EgeMail  
+## Yeni Nesil Yapay Zeka Destekli E-Posta Yönetim ve Otomasyon Sistemi
 
-Sistem, geleneksel e-posta altyapılarını modern teknolojilerle harmanlayarak, kullanıcı deneyimini ve veri yönetimini en üst seviyeye çıkarmayı hedeflemektedir.
+**EgeMail**, M&Y Akademi Full Stack C# Bootcamp kapsamında **“Case 2”** olarak geliştirilmiş; modern web geliştirme standartlarını, yüksek güvenlik protokollerini ve **yapay zeka destekli otomasyonu** bir araya getiren kapsamlı bir e-posta yönetim simülasyonudur.
 
-Proje Vizyonu ve Mimari Yol Haritası
-Bu proje, mevcut haliyle işlevsel bir bütünlüğe sahip olmakla birlikte, kurumsal ölçekte sürdürülebilirliği ve genişletilebilirliği sağlamak adına ciddi bir mühendislik yol haritasına sahiptir. Geliştirme süreci, sadece kod yazmayı değil, yazılım mimarisini en doğru prensiplerle kurgulamayı amaçlamaktadır.
+Sistem, geleneksel e-posta altyapılarını modern teknolojilerle harmanlayarak **kullanıcı deneyimini** ve **veri yönetimini** en üst seviyeye çıkarmayı hedefler.
 
-Projenin teknik evrimi için belirlenen temel hedefler şunlardır:
+---
 
-Katmanlı Mimari (N-Tier Architecture): Mevcut yapının; sunum, iş mantığı ve veri erişim katmanlarına ayrılarak, bağımlılıkların minimize edildiği (Loose Coupling) profesyonel bir yapıya dönüştürülmesi.
+## 🎯 Proje Vizyonu ve Mimari Yol Haritası
 
-SOLID Prensipleri: Kod tabanının her satırında Tek Sorumluluk (SRP), Açık/Kapalı (OCP) ve Bağımlılıkların Tersine Çevrilmesi (DIP) gibi prensiplere tam uyum sağlanması.
+Proje mevcut haliyle işlevsel bir bütünlüğe sahip olsa da, **kurumsal ölçekte sürdürülebilirlik** ve **genişletilebilirlik** hedeflenerek ciddi bir mühendislik yol haritası üzerine konumlandırılmıştır.
 
-Fat Controller Anti-Pattern'inden Kaçınma: İş mantığının (Business Logic) controller sınıflarından tamamen arındırılıp servis katmanlarına taşınması ile daha temiz ve test edilebilir bir yapı kurulması.
+Amaç yalnızca çalışan bir uygulama geliştirmek değil; **doğru yazılım mimarisi**, **test edilebilirlik** ve **uzun vadeli bakım maliyetlerini düşüren** bir yapı inşa etmektir.
 
-Veri Transfer Nesneleri (DTO) ve AutoMapper: Veritabanı varlıklarının (Entities) doğrudan dış dünyaya açılmasını engelleyerek, AutoMapper kütüphanesi ile güvenli ve optimize edilmiş veri transferi sağlanması.
+### Teknik Evrim Hedefleri
 
-Gelişmiş Önbellekleme Stratejileri: Performansı maksimize etmek adına Memory Cache ve dağıtık sistemler için Distributed Cache (Redis vb.) mekanizmalarının entegrasyonu.
+- **Katmanlı Mimari (N-Tier Architecture)**  
+  Sunum, iş mantığı ve veri erişim katmanlarının ayrıştırılmasıyla düşük bağımlılığa (Loose Coupling) sahip profesyonel bir yapı.
 
-API Odaklı Yaklaşım: Sistemin sadece web arayüzü ile sınırlı kalmayıp; mobil ve masaüstü uygulamalarla haberleşebilecek güçlü, dokümante edilmiş RESTful API servislerinin sunulması.
+- **SOLID Prensipleri**  
+  - SRP (Single Responsibility Principle)  
+  - OCP (Open/Closed Principle)  
+  - DIP (Dependency Inversion Principle)  
 
-Teknik Özellikler ve Kullanılan Teknolojiler
-Proje, endüstri standardı teknolojiler üzerine inşa edilmiştir:
+- **Fat Controller Anti-Pattern’inden Kaçınma**  
+  İş mantığının controller sınıflarından tamamen ayrılarak **service katmanına** taşınması.
 
-.NET 8 Core: Yüksek performanslı ve platformlar arası çalışabilen backend altyapısı.
+- **DTO & AutoMapper Kullanımı**  
+  Entity’lerin dış dünyaya doğrudan açılmasının engellenmesi ve güvenli veri transferi.
 
-ASP.NET Core Identity: Kullanıcı kimlik doğrulama, yetkilendirme ve güvenliğin sağlanması için endüstri standardı kütüphane entegrasyonu.
+- **Gelişmiş Önbellekleme Stratejileri**  
+  - In-Memory Cache  
+  - Distributed Cache (Redis vb.)
 
-Entity Framework Core (EF Core): Veritabanı işlemleri için modern ORM yaklaşımı.
+- **API Odaklı Mimari**  
+  Web, mobil ve masaüstü istemcilerle haberleşebilecek **RESTful API** altyapısı.
 
-Google Gemini AI Entegrasyonu: Gelen e-postaların içeriğini analiz ederek otomatik kategorizasyon yapan yapay zeka servisi.
+---
 
-QuillJS: Kullanıcılara zengin metin düzenleme (Rich Text Editor) imkanı sunan, esnek ve modern metin editörü.
+## 🛠️ Teknik Özellikler ve Kullanılan Teknolojiler
 
-Responsive UI: Bootstrap ve özel tasarımlar ile her cihazda kusursuz çalışan kullanıcı arayüzü.
+- **.NET 8 Core**
+- **ASP.NET Core Identity**
+- **Entity Framework Core (EF Core)**
+- **Google Gemini AI Entegrasyonu**
+- **QuillJS**
+- **Responsive UI (Bootstrap)**
 
-Yapay Zeka Entegrasyonu: Otomatik Kategorizasyon
-Projenin en dikkat çekici özelliklerinden biri, GeminiService aracılığıyla sağlanan yapay zeka desteğidir. Sistem, Google Gemini modellerini kullanarak e-posta içeriklerini anlamsal olarak analiz eder ve ilgili kategorilere (İş, Sosyal, Tanıtım vb.) otomatik olarak atar. Bu özellik, kullanıcıların posta kutusu yönetimini otonom hale getirmektedir.
+---
 
-Yapılandırma (Configuration)
-Gemini AI servisinin aktif olarak çalışabilmesi için appsettings.json dosyasına ilgili API anahtarlarının girilmesi gerekmektedir. Sistem, konfigürasyonu aşağıdaki formatta beklemektedir:
+## 🤖 Yapay Zeka Entegrasyonu – Otomatik Kategorizasyon
 
-JSON
-  "Gemini": {
-    "ApiKey": "BURAYA_GOOGLE_GEMINI_API_KEY_GIRILECEK",
-    "Url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
-  }
-Not: API Key temini için Google AI Studio platformunu kullanabilirsiniz.
+Sistem, **Google Gemini** modelleri kullanarak e-posta içeriklerini anlamsal olarak analiz eder ve otomatik olarak kategorilere ayırır:
 
-Veritabanı ve Seed Data Yönetimi
-Proje, Code-First yaklaşımı ile geliştirilmiştir. Ancak, sistemin performansını test etmek ve gerçekçi bir veri seti üzerinde çalışmak amacıyla yapay zeka destekli bir SQL tohumlama (seeding) stratejisi izlenmiştir.
+- İş  
+- Sosyal  
+- Tanıtım  
+- Diğer  
 
-SeedData.sql: Proje içerisinde yer alan bu dosya, yapay zekaya özel olarak ürettirilmiş olup, veritabanını test amaçlı binlerce anlamlı veri ile (Kullanıcılar, E-postalar, Loglar) doldurmak için kullanılır. Bu sayede uygulamanın yüksek veri yükü altındaki davranışı simüle edilebilmektedir.
+---
 
-Kurulum ve Çalıştırma
-Projeyi yerel ortamınızda çalıştırmak için aşağıdaki adımları izleyin:
+## ⚙️ Yapılandırma (Configuration)
 
-Repoyu Klonlayın:
+```json
+"Gemini": {
+  "ApiKey": "BURAYA_GOOGLE_GEMINI_API_KEY_GIRILECEK",
+  "Url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+}
+```
 
-Bash
+> Not: API Key için **Google AI Studio** kullanılmalıdır.
+
+---
+
+## 🗄️ Veritabanı ve Seed Data
+
+- **Code-First** yaklaşımı
+- Yapay zeka ile üretilmiş **SeedData.sql**
+- Binlerce kullanıcı, e-posta ve log verisi
+
+---
+
+## 🚀 Kurulum ve Çalıştırma
+
+### Repoyu Klonlayın
+```bash
 git clone https://github.com/nullablege/egemail
-Veritabanını Güncelleyin: Package Manager Console üzerinden migration işlemlerini uygulayın:
+```
 
-PowerShell
+### Veritabanını Güncelleyin
+```powershell
 Update-Database
-Konfigürasyon: appsettings.json dosyasındaki veritabanı bağlantı dizesini (Connection String) ve Gemini API ayarlarını kendi ortamınıza göre düzenleyin.
+```
 
-Uygulamayı Başlatın: Projeyi Visual Studio veya CLI üzerinden derleyip ayağa kaldırın.
+### Konfigürasyon
+`appsettings.json` içindeki bağlantı ayarlarını düzenleyin.
 
-Bu proje, modern web teknolojilerinin yeteneklerini sergileyen ve sürekli gelişime açık bir mimari ile tasarlanmış profesyonel bir çalışmadır.
+### Uygulamayı Çalıştırın
+Visual Studio veya CLI üzerinden başlatın.
+
 
 Proje görselleri : 
 <img width="1914" height="914" alt="image" src="https://github.com/user-attachments/assets/1cd63e16-ee10-48dd-9386-a66ac651e743" />
